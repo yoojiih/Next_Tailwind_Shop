@@ -2,6 +2,14 @@ import { Fragment, useState } from 'react'
 import { Dialog, Popover, Tab, Transition } from '@headlessui/react'
 import { MenuIcon, SearchIcon, ShoppingBagIcon, XIcon, UserIcon, HeartIcon, LoginIcon } from '@heroicons/react/outline'
 
+// a태그 or href(location)을 사용하는 대신 next의 Router사용 시 
+// 페이지가 새로고침 되면서 이동하지 않고 페이지는 그대로 안의 내용물만 바뀜
+// import { useRouter } from 'next/dist/client/router'
+import Link from "next/link"; 
+import ItemList from "./ItemList";
+import { useRouter } from "next/router";
+
+import Axios from "axios";
 const navigation = {
     categories: [
         {
@@ -129,9 +137,34 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
-export default function Nav() {
-    const [open, setOpen] = useState(false)
+export default function Nav({ item }) {
+    const [open, setOpen] = useState(false);
 
+    const router = useRouter();
+    console.log(router);
+
+    // router객체 내 pathname을 이용해 메뉴 active 해주기
+    // 1. activeItem 변수 생성
+    // 2. router의 pathname 에 따라서 activeItem에 각 페이지 이름이 들어가도록 해놓고
+    // 3. 각 Menu의 active가 활성화 되게
+    // const activeItem = "home";  -> 임의지정
+    // const activeItem;
+
+    // if (router.pathname === "/") {
+    //     activeItem = "home";
+    // } else if (router.pathname === "/about") {
+    //     activeItem = "about";
+    // } else if (router.pathname === "/admin") {
+    //     activeItem = "admin";
+    // }
+
+    const goLink = (e) => {
+        console.log("data:ssss ");
+    }
+    const cate = (e) => {
+        return <ItemList list={list.slice(1, 10)} /> ;
+    }
+    
     return (
         <div className="bg-white">
         {/* Mobile menu */}
@@ -146,7 +179,7 @@ export default function Nav() {
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
             >
-                <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-25" />
+            <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-25" />
             </Transition.Child>
 
             <Transition.Child
@@ -368,7 +401,7 @@ export default function Nav() {
                                         <div className="row-start-1 grid grid-cols-3 gap-y-10 gap-x-8 text-sm">
                                         {category.sections.map((section) => (
                                             <div key={section.name}>
-                                            <p id={`${section.name}-heading`} className="font-medium text-gray-900">
+                                            <p id={`${section.name}-heading`} className="font-medium text-gray-900" onClick={cate}>
                                                 {section.name}
                                             </p>
                                             <ul
@@ -410,26 +443,27 @@ export default function Nav() {
                     </div>
                 </Popover.Group>
 
+{/* 오른쪽 로그인, 마이페이지. 좋아요, 쇼핑백 아이콘 */}
 
                 <div className="ml-auto flex items-center">
                     <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
                     <a href="#" className="text-sm font-medium text-gray-700 hover:text-gray-800">
                         <span className="sr-only">LOGIN</span>
-                        <LoginIcon className="w-6 h-6" aria-hidden="true" />
+                        <LoginIcon className="w-6 h-6" aria-hidden="true" onClick={() => {router.push("/login");}}/>
                     </a>
                     <span className="h-6 w-px bg-gray-200" aria-hidden="true" />
                     <a href="#" className="text-sm font-medium text-gray-700 hover:text-gray-800">
                         <span className="sr-only">MY PAGE</span>
-                        <UserIcon className="w-6 h-6" aria-hidden="true" />
+                        <UserIcon className="w-6 h-6" aria-hidden="true" onClick={() => {router.push("/login");}} />
                     </a>
                     <a href="#" className="text-sm font-medium text-gray-700 hover:text-gray-800">
                         <span className="sr-only">MY HEART</span>
-                        <HeartIcon className="w-6 h-6" aria-hidden="true" />
+                        <HeartIcon className="w-6 h-6" aria-hidden="true" onClick={() => {router.push("/login");}} />
                     </a>
                     {/* Cart */}
                     <a href="#" className="group -m-2 p-2 flex items-center text-sm font-medium">
                         <span className="sr-only">SHOPPING BAG</span>
-                        <ShoppingBagIcon className="flex-shrink-0 h-6 w-6 text-gray-800 group-hover:text-gray-400" aria-hidden="true" />
+                        <ShoppingBagIcon className="flex-shrink-0 h-6 w-6 text-gray-800 group-hover:text-gray-400" aria-hidden="true" onClick={() => {router.push("/login");}}/>
                         <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-400">0</span>
                     </a>
                     </div>
@@ -441,3 +475,17 @@ export default function Nav() {
         </div>
     )
 }
+
+
+export async function getStaticProps() {
+    const apiUrl = process.env.apiUrl;
+    const res = await Axios.get(apiUrl);
+    const data = res.data;
+    
+    return {
+    props: {
+        list: data,
+        name: process.env.name,
+    },
+};
+} 
