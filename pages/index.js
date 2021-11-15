@@ -9,7 +9,6 @@ import Head from 'next/head'
 // 서버에서 pre-rendering을 한 후에 브라우저로 파일을 넘겨주기 때문에 
 // metadata가 적용된 상태로 브라우저가 html파일을 받아볼 수 있게된다.
 
-
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 

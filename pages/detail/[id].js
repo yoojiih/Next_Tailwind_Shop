@@ -11,8 +11,7 @@ const Post = ({ item, name }) => {
 
     if (router.isFallback) {
         return (
-        <div style={{ padding: "100px 0" }}>
-        </div>
+        <div style={{ padding: "100px 0" }}></div>
         );
     }
 

@@ -3,6 +3,17 @@ import { useState } from 'react'
 import { StarIcon } from '@heroicons/react/solid'
 import { RadioGroup } from '@headlessui/react'
 
+import Todo from './Todo';
+import TodoHead from './TodoHead';
+import TodoList from './TodoList';
+import TodoCreate from './TodoCreate';
+import { TodoProvider } from '../../store/TodoContext';
+
+// add cart redux
+import { useCallback } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import * as cartActions from '../../store/modules/cart';
+
 
 const product = {
     name: 'Basic Tee 6-Pack',
@@ -65,6 +76,7 @@ const product = {
 
 export default function Item({ item }) {
     const {
+        id,
         name,
         image_link,
         price,
@@ -77,28 +89,44 @@ export default function Item({ item }) {
 
     const [selectedColor, setSelectedColor] = useState(product.colors[0])
     const [selectedSize, setSelectedSize] = useState(product.sizes[2])
+    const dispatch = useDispatch();
+
+    const value = useSelector(({ cart }) => cart.value);
+    const valuelist = useSelector(({ cart }) => cart.valuelist);
+    
+    const plus = useCallback(({ value }) => {
+        dispatch(cartActions.increment({ value }));
+    }, [dispatch]);
+
+    const minus = useCallback(({ value }) => {
+        dispatch(cartActions.decrement({ value }));
+    }, [dispatch]);
+    
+    // 장바구니 추가 이벤트 setcart = store>modules>cart.js
+
+    const add = useCallback(({ valuelist }) => {
+        dispatch(cartActions.setcart({ valuelist: {id} }));
+    }, [dispatch]);
+
+    // useEffect(() => {
+    //     console.log(iid);
+    //     console.log('업데이트 될 때 실행된다');
+    // }, [id]);
 
     return (
-        
         <div className="bg-white">
-{/* 
-        <div>
-            <div>
-            <img src={image_link} alt={name} />
-            </div>
-            <div>
-            <strong>{name}</strong>
-            <strong>${price}</strong>
-            <span>
-                {category ? `${category}/` : ""}
-                {product_type}
-            </span>
-            <Button color="orange">구매하기</Button>
-            </div>
-        </div>
-        <Header as="h3">Description</Header>
-        <p style={{ paddingBottom: 20, fontSize: 18 }}>{description}</p> */}
-    
+            <button onClick={() => minus({ value })}>-</button>
+            <span>{value}</span>
+            <button onClick={() => plus({ value })}>+</button>
+            <button
+                //type="submit"
+                className="mt-10 w-full bg-indigo-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"           
+                onClick={() => add({ valuelist })}>
+                Add to bag
+            </button>
+
+        <TodoProvider><Todo><TodoHead /><TodoList /><TodoCreate /></Todo></TodoProvider>
+
         <div className="pt-6">
             <nav aria-label="Breadcrumb">
             <ol role="list" className="max-w-2xl mx-auto px-4 flex items-center space-x-2 sm:px-6 lg:max-w-7xl lg:px-8">
@@ -297,13 +325,13 @@ export default function Item({ item }) {
                     </div>
                     </RadioGroup>
                 </div>
-
                 <button
-                    type="submit"
-                    className="mt-10 w-full bg-indigo-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
+                    //type="submit"
+                    className="mt-10 w-full bg-indigo-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"           
+                    onClick={() => add({ valuelist })}>
                     Add to bag
                 </button>
+                <span>{id}</span>
                 </form>
             </div>
 
